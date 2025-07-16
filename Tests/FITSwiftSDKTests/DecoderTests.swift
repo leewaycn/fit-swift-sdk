@@ -27,6 +27,16 @@ class TestMesgListener: MesgListener, FileIdMesgListener, RecordMesgListener {
     }
 }
 
+class ShortCircuitMesgListener: FileIdMesgListener {
+    func onMesg(_ mesg: FileIdMesg) throws {
+        throw TestShortCircuitError.fileIdMesgFound(mesg)
+    }
+}
+
+enum TestShortCircuitError: Error {
+    case fileIdMesgFound(FileIdMesg)
+}
+
 class TestMesgDefinitionListener: MesgDefinitionListener {
     var mesgDefinitions: [MesgDefinition] = []
     
@@ -313,8 +323,8 @@ final class DecoderTests: XCTestCase {
         
         decoder.addMesgListener(mesgBroadcaster)
         
-        decoder.broadcastMesg(FileIdMesg())
-        decoder.broadcastMesg(RecordMesg())
+        try decoder.broadcastMesg(FileIdMesg())
+        try decoder.broadcastMesg(RecordMesg())
         
         XCTAssertEqual(mesgListener.fileIdMesgs.count, 1)
     }
@@ -329,7 +339,7 @@ final class DecoderTests: XCTestCase {
         }
         
         let fileIdMesg = FileIdMesg()
-        XCTAssertNoThrow(decoder.broadcastMesg(fileIdMesg))
+        XCTAssertNoThrow(try decoder.broadcastMesg(fileIdMesg))
     }
     
     func test_broadcastMesg_whenOutOfScopeMesgDefinitionListenerWeakRef_doesNotThrow() throws {
@@ -343,7 +353,7 @@ final class DecoderTests: XCTestCase {
         
         let fileIdMesg = FileIdMesg()
         let fileIdMesgDefinition = MesgDefinition(mesg: fileIdMesg)
-        XCTAssertNoThrow(decoder.broadcastMesgDefinition(fileIdMesgDefinition))
+        XCTAssertNoThrow(try decoder.broadcastMesgDefinition(fileIdMesgDefinition))
     }
 
     func test_broadcastMesg_whenOutOfScopeDeveloperFieldDescriptionListenerWeakRef_doesNotThrow() throws {
@@ -358,5 +368,21 @@ final class DecoderTests: XCTestCase {
         let fileIdMesg = FileIdMesg()
         let developerFieldDescription = DeveloperFieldDescription(developerDataIdMesg: DeveloperDataIdMesg(), fieldDescriptionMesg: FieldDescriptionMesg(mesg: fileIdMesg))
         XCTAssertNoThrow(decoder.broadcastDeveloperFieldDescription(developerFieldDescription))
+    }
+
+    func test_broadcastMesg_whenOnMesgExplicitlyThrows_rethrows() throws {
+        let stream = FITSwiftSDK.InputStream(data: fitFileShort)
+        let decoder = Decoder(stream: stream)
+
+        let fileIdMesg = FileIdMesg()
+        try fileIdMesg.setType(File.activity)
+
+        let mesgListener = ShortCircuitMesgListener()
+        let mesgBroadcaster = MesgBroadcaster()
+
+        mesgBroadcaster.addListener(mesgListener as FileIdMesgListener)
+        decoder.addMesgListener(mesgBroadcaster)
+
+        XCTAssertThrowsError(try decoder.broadcastMesg(fileIdMesg))
     }
 }

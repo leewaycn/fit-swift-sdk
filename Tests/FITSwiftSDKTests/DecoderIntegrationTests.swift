@@ -26,6 +26,28 @@ final class DecoderIntegrationTests: XCTestCase {
         XCTAssertEqual(mesgListener.fileIdMesgs.count, 1)
     }
 
+    func test_whenBroadcastersWithThrowableListenersAreAddedToDecoder_listenerErrorsShouldBeRethrown() throws {
+        let stream = FITSwiftSDK.InputStream(data: fitFileShort)
+        let decoder = Decoder(stream: stream)
+
+        let mesgListener = ShortCircuitMesgListener()
+        let mesgBroadcaster = MesgBroadcaster()
+
+        mesgBroadcaster.addListener(mesgListener as FileIdMesgListener)
+        decoder.addMesgListener(mesgBroadcaster)
+
+        // Short circuit the decoder on FileIdMesg
+        do {
+            try decoder.read()
+        }
+        catch TestShortCircuitError.fileIdMesgFound(let fileIdMesg) {
+            XCTAssertEqual(fileIdMesg.getType(), File.activity)
+
+            // The decoder should be short circuited and not have read completely
+            XCTAssertNotEqual(stream.position, stream.count)
+        }
+    }
+
     // MARK: BufferedMesgBroadcaster Integration Tests
     func test_whenBroadcastersWithListenersAreAddedToDecoder_mesgsShouldBeBroadcastedAfterBroadcast() throws {
         let stream = FITSwiftSDK.InputStream(data: fitFileShort)

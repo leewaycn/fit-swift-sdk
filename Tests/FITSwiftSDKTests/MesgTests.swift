@@ -402,4 +402,21 @@ final class MesgTests: XCTestCase {
         
         return
     }
+
+    // MARK: Constructor Tests
+    func test_constructor_fromMesg_MaintainsOrderOfFields() throws {
+        let originalMesg = RecordMesg()
+        try originalMesg.setTimestamp(DateTime.init())
+        try originalMesg.setHeartRate(50)
+        try originalMesg.setPositionLat(123456)
+        try originalMesg.setSpeed(100)
+
+        let copyMesg = Mesg(mesg: originalMesg)
+
+        let originalFields = originalMesg.fields
+        let copyFields = copyMesg.fields
+
+        XCTAssertEqual(originalMesg, copyMesg)
+        XCTAssertEqual(originalFields, copyFields)
+    }
 }

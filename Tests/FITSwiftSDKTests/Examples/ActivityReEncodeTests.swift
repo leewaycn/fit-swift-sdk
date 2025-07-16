@@ -38,9 +38,9 @@ final class ActivityReEncodeTests: XCTestCase {
 }
 
 class RemoveExpandedComponentsFilter: MesgFilter {
-    override public func onMesg(_ mesg: Mesg) {
+    override public func onMesg(_ mesg: Mesg) throws {
         mesg.removeExpandedFields()
-        super.onMesg(mesg)
+        try super.onMesg(mesg)
     }
 }
     
