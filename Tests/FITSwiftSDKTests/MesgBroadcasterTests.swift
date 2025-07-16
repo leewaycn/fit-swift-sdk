@@ -21,7 +21,7 @@ final class MesgBroadcasterTests: XCTestCase {
     func test_onMesg_whenPassedMesg_sendsMesgToGenericMesgListener() throws {
         mesgBroadcaster.addListener(mesgListener as RecordMesgListener)
         
-        mesgBroadcaster.onMesg(RecordMesg())
+        try mesgBroadcaster.onMesg(RecordMesg())
         
         XCTAssertEqual(mesgListener.recordMesgs.count, 1)
     }
@@ -29,13 +29,13 @@ final class MesgBroadcasterTests: XCTestCase {
     func test_onMesg_afterCallingRemoveListener_preventsListenerOnMesgCallback() throws {
         mesgBroadcaster.addListener(mesgListener as RecordMesgListener)
         
-        mesgBroadcaster.onMesg(RecordMesg())
+        try mesgBroadcaster.onMesg(RecordMesg())
         
         XCTAssertEqual(mesgListener.recordMesgs.count, 1)
         
         // Removing the listener and calling onMesg should show the listener is disconnected
         mesgBroadcaster.removeListener(mesgListener as RecordMesgListener)
-        mesgBroadcaster.onMesg(RecordMesg())
+        try mesgBroadcaster.onMesg(RecordMesg())
         
         XCTAssertEqual(mesgListener.recordMesgs.count, 1)
     }
@@ -45,17 +45,17 @@ final class MesgBroadcasterTests: XCTestCase {
         mesgBroadcaster.addListener(mesgListener as RecordMesgListener)
         
         // No listeners for Session messages
-        mesgBroadcaster.onMesg(SessionMesg())
+        try mesgBroadcaster.onMesg(SessionMesg())
         
         XCTAssertEqual(mesgListener.fileIdMesgs.count, 0)
         XCTAssertEqual(mesgListener.recordMesgs.count, 0)
         
-        mesgBroadcaster.onMesg(RecordMesg())
+        try mesgBroadcaster.onMesg(RecordMesg())
         
         XCTAssertEqual(mesgListener.fileIdMesgs.count, 0)
         XCTAssertEqual(mesgListener.recordMesgs.count, 1)
         
-        mesgBroadcaster.onMesg(FileIdMesg())
+        try mesgBroadcaster.onMesg(FileIdMesg())
         
         XCTAssertEqual(mesgListener.fileIdMesgs.count, 1)
         XCTAssertEqual(mesgListener.recordMesgs.count, 1)
