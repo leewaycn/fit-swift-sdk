@@ -1370,7 +1370,7 @@ public class MesgBroadcaster: MesgListener {
     }
     
     public func onMesg(_ mesg: Mesg) throws {
-        switch(MesgNum(rawValue: mesg.mesgNum)!) {
+        switch(MesgNum(rawValue: mesg.mesgNum) ?? .invalid) {
         case .fileId:
             if (self.fileIdMesgListeners.count == 0) {
                 return
