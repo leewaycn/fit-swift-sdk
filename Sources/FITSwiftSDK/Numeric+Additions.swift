@@ -214,7 +214,7 @@ extension Float64 {
                 break
             }
 
-            value = Float64(floatLiteral: Float64(binaryFloatingPointValue))
+            value = Float64(binaryFloatingPointValue)
         case let stringProtocolValue as any StringProtocol:
             value = Float64(String(stringProtocolValue))!
         case let boolValue as Bool:

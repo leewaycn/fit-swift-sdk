@@ -44,13 +44,15 @@ open class Field: FieldBase {
         self.accumulated = field.accumulated
         self.isExpandedField = field.isExpandedField
         
-        for subfield in field.subFields {
-            self.subFields.append(subfield)
-        }
-        
-        for component in field.components {
-            self.components.append(component)
-        }
+        // for subfield in field.subFields {
+        //     self.subFields.append(subfield)
+        // }
+        self.subFields = field.subFields
+
+        // for component in field.components {
+        //     self.components.append(component)
+        // }
+        self.components = field.components
         
         super.init(fieldBase: field)
     }
