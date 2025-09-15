@@ -11,7 +11,7 @@
 
 
 import Foundation
-import OrderedCollections
+
 
 open class Mesg: Equatable {
     public let name: String
@@ -19,8 +19,8 @@ open class Mesg: Equatable {
     public internal(set)var localMesgNum: LocalMesgNum = LocalMesgNum.zero
     public internal(set)var decoderMesgIndex: Int = 0
     
-    var fields: OrderedDictionary<UInt8, Field> = [:]
-    var devFields: OrderedDictionary<DeveloperDataKey, DeveloperField> = [:]
+    var fields: Dictionary<UInt8, Field> = [:]
+    var devFields: Dictionary<DeveloperDataKey, DeveloperField> = [:]
 
     enum MesgError: Error {
         case subFieldNotSupported
